@@ -2,7 +2,7 @@
 """
 Created on Mon May  4 15:52:27 2026
 
-Modified on Mon May  19 15:11:56 2026
+Modified on Thu May  21 14:46:56 2026
 
 @author: daphne_seaphysics
 """
@@ -31,6 +31,7 @@ def spec1dread(filename):
     if time==1:
         index+=3 
         nloc=int(lines[index].split()[0])
+        print(f'Number of locations: {nloc}')
         index+=1 
     else:     
         if index<len(lines) and lines[index].startswith('LOCATION'):
@@ -47,6 +48,7 @@ def spec1dread(filename):
     if index<len(lines) and lines[index].startswith('AFREQ'):
         index+=1 
         nfreq = int(lines[index].split()[0])
+        print(f'Spectra over: {nfreq} frequencies')
         index+=1
         for _ in range(nfreq):
             f = lines[index]
@@ -89,28 +91,30 @@ def spec1dread(filename):
     elif time==1:
         index+=1
         print('start time:', lines[index].split()[0])
-        index+=1 
-        for ii in range(nloc):
-            if index>=len(lines):
-                break
-            index+=1
-            if index<len(lines) and lines[index].startswith('NODATA'):
-                index+=1
-            if index<len(lines) and lines[index].startswith('LOCATI'):
+        while index<=len(lines):
+            if index<len(lines) and lines[index].endswith('date and time'):
                 index+=1 
-                spec=[]
-                dire=[]
-                spr=[]
-                for j in range(nfreq):
-                    if index >= len(lines):
+                for ii in range(nloc):
+                    if index>=len(lines):
                         break
-                    spec_line = lines[index].split()
-                    spec_line[0], spec_line[1], spec_line[2] = float(spec_line[0]), float(spec_line[1]), float(spec_line[2])
-                    spec.append(spec_line[0])
-                    dire.append(spec_line[1])
-                    spr.append(spec_line[2])
-                    index+=1
+                    if index<len(lines) and lines[index].startswith('NODATA'):
+                        index+=1
+                    if index<len(lines) and lines[index].startswith('LOCATI'):
+                        index+=1 
+                        spec=[]
+                        dire=[]
+                        spr=[]
+                        for j in range(nfreq):
+                            if index >= len(lines):
+                                break
+                            spec_line = lines[index].split()
+                            spec_line[0], spec_line[1], spec_line[2] = float(spec_line[0]), float(spec_line[1]), float(spec_line[2])
+                            spec.append(spec_line[0])
+                            dire.append(spec_line[1])
+                            spr.append(spec_line[2])
+                            index+=1
                 
-                S.append({'f':freq,'S':spec,'dir':dire,'spread':spr, 'pos':[x[ii],y[ii]],'type':'freq'})
-                index-=1 
+                    S.append({'f':freq,'S':spec,'dir':dire,'spread':spr, 'pos':[x[ii],y[ii]],'type':'freq'})
+                if index>=len(lines):
+                    break
     return S
