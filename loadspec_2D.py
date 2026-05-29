@@ -2,7 +2,7 @@
 """
 Created on Mon May  4 15:52:27 2026
 
-@author: daphne_seaphysics
+@author: daphn
 """
 
 import numpy as np
@@ -29,12 +29,21 @@ def spec2dread(filename):
     #checking for non-stationary data
     if index<len(lines) and lines[index].startswith('TIME'):
         time=1
-        #check to increases index
+        print('time dependent')
+        index+=2 
+        print(lines[index])
+    #get number of locations for timedependent
+    if index<len(lines) and lines[index].startswith('LONLAT'):
+        index+=1 
+        nloc= int(lines[index].split()[0])
+        index+=1 
+        print(f'{nloc} locations in spherical coordinates')
     #get number of locations
     if index<len(lines) and lines[index].startswith('LOCATION'):
         index +=1
         nloc = int(lines[index].split()[0])
         index+=1 
+        print(f'{nloc} locations')
     #append locations to x and y arrays
     for _ in range(nloc):
         if index<len(lines):
@@ -47,6 +56,7 @@ def spec2dread(filename):
         index+=1 
         nfreq = int(lines[index].split()[0])
         index+=1
+        print(f'{nfreq} frequencies')
     for _ in range(nfreq):
         f = lines[index]
         f=float(f)
@@ -58,6 +68,7 @@ def spec2dread(filename):
         index+=1
         ndir = int(lines[index].split()[0])
         index+=1
+        print(f'{ndir} directions')
     for _ in range(ndir):
         f=lines[index]
         f=float(f)
@@ -88,4 +99,34 @@ def spec2dread(filename):
                     spec_mat.append(row)
                     index+=1
                 S.append({'f':freq,'dir':dire,'fact':factor,'S':spec_mat, 'pos':[x[ii],y[ii]],'type':'spec_2d'})
+                print(f'loc {ii} ok')
+    if time == 1:
+        date=[]
+        while index<len(lines):
+            if lines[index].endswith('date and time'):
+                date.append(lines[index].split()[0])
+                print(lines[index].split()[0])
+                index+=1
+                for ii in range(nloc):
+                    if index>=len(lines):
+                        break
+                    if lines[index].startswith('NODATA'):
+                        index+=1
+                    if lines[index].startswith('FACTOR'):
+                        index+=1 
+                        factor.append(lines[index].split()[0])
+                        index+=1
+                    spec_mat=[]
+                    for j in range(nfreq):
+                        if index >= len(lines):
+                            break
+                        row = list(map(float,lines[index].split()))
+                        spec_mat.append(row)
+                        index+=1
+                    S.append({'f':freq,'dir':dire,'fact':factor,'S':spec_mat, 'date':date[-1],'pos':[x[ii],y[ii]],'type':'spec_2d'})
+                    print(f'loc {ii} ok')
+    print('done')
     return S
+
+
+
