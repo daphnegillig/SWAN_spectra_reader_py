@@ -2,7 +2,7 @@
 """
 Created on Mon May  4 15:52:27 2026
 
-Modified on Thu May  21 14:46:56 2026
+Modified on Mon Jun  01 11:06:56 2026
 
 @author: daphne_seaphysics
 """
@@ -93,6 +93,8 @@ def spec1dread(filename):
         print('start time:', lines[index].split()[0])
         while index<=len(lines):
             if index<len(lines) and lines[index].endswith('date and time'):
+                date=lines[index].split()[0]
+                print(date)
                 index+=1 
                 for ii in range(nloc):
                     if index>=len(lines):
@@ -114,7 +116,8 @@ def spec1dread(filename):
                             spr.append(spec_line[2])
                             index+=1
                 
-                    S.append({'f':freq,'S':spec,'dir':dire,'spread':spr, 'pos':[x[ii],y[ii]],'type':'freq'})
+                    S.append({'f':freq,'S':spec,'dir':dire,'spread':spr, 'pos':[x[ii],y[ii]],'date':date,'type':'freq'})
                 if index>=len(lines):
                     break
+    #print(lines[index])
     return S
