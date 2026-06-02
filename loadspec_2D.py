@@ -2,7 +2,7 @@
 """
 Created on Mon May  4 15:52:27 2026
 
-@author: daphn
+@author: daphne_seaphysics
 """
 
 import numpy as np
@@ -120,13 +120,19 @@ def spec2dread(filename):
                     for j in range(nfreq):
                         if index >= len(lines):
                             break
-                        row = list(map(float,lines[index].split()))
-                        spec_mat.append(row)
-                        index+=1
+                        if lines[index].startswith('****'):
+                            index+=nfreq
+                            print(lines[index])
+                            break
+                        if lines[index].startswith('ZERO'):
+                            index+=1 
+                            break
+                        else:
+                            row = list(map(float,lines[index].split()))
+                            spec_mat.append(row)
+                            index+=1
                     S.append({'f':freq,'dir':dire,'fact':factor,'S':spec_mat, 'date':date[-1],'pos':[x[ii],y[ii]],'type':'spec_2d'})
                     print(f'loc {ii} ok')
     print('done')
     return S
-
-
 
